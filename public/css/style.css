@@ -1003,3 +1003,43 @@ header p {
     color: #000;
     box-shadow: 0 0 10px #eab308;
 }
+/* ==========================================
+   📱 MOBILE RESPONSIVE FIXES (For Phones)
+   ========================================== */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Game Container ko responsive banao */
+    #game-content, .menu-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 15px !important;
+        box-sizing: border-box;
+    }
+
+    /* Buttons mobile par bikhrein nahi full width rahein */
+    .menu-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        font-size: 16px !important;
+        padding: 12px 8px !important;
+        margin-inline: auto;
+    }
+
+    /* Agar games ki grid hai toh use single column kar do */
+    .games-grid, .grid-container {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    /* Text areas aur wrappers ka overflow roko */
+    h1 {
+        font-size: 24px !important;
+    }
+    h2 {
+        font-size: 20px !important;
+    }
+}
