@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Fusion</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <div id="main-menu-view" class="view-panel">
+            <div class="hero-section">
+                <h1 class="main-title" style="font-size: 45px; margin-bottom: 10px; animation: pulse 2s infinite;">🕹️ FUN FUSION</h1>
+                <p style="color: #a1a1aa; font-size: 16px; margin-bottom: 40px; letter-spacing: 2px;">  ENDLESS FUN</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <button class="grand-btn online-btn" onclick="playClick(); switchView('online-setup-view')">
+                    <span style="font-size: 30px; display: block; margin-bottom: 5px;">🌐</span>
+                    <h2 style="margin: 0; font-size: 22px;">ONLINE MODE</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: normal; color: #e2e8f0;">Connect multiple devices</p>
+                </button>
+                
+                <button class="grand-btn offline-btn" onclick="playClick(); switchView('offline-hub-view')">
+                    <span style="font-size: 30px; display: block; margin-bottom: 5px;">📱</span>
+                    <h2 style="margin: 0; font-size: 22px;">PASS & PLAY</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: normal; color: #e2e8f0;">Play together on this screen</p>
+                </button>
+            </div>
+
+            <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; color: #666; font-size: 12px; font-family: monospace;">
+                System v1.0 • Built by <span id="secret-trigger" onclick="triggerSecretProposal()" style="color: #444; font-weight: bold; cursor: pointer; user-select: none;">Babu</span>
+            </div>
+        </div>
+
+        <!-- Offline Hub View -->
+        <div id="offline-hub-view" class="view-panel hidden">
+            <button class="menu-btn" style="background: transparent; color: #a1a1aa; border: 1px solid #444; width: auto; padding: 5px 15px; font-size: 12px; margin-bottom: 20px;" onclick="playClick(); switchView('main-menu-view')">⬅️ BACK TO MAIN</button>
+            
+            <h1 style="color: var(--accent-green); margin-bottom: 10px;">Pass & Play 📱</h1>
+            <p style="color: #a1a1aa; margin-bottom: 30px;">Ek hi screen par doston ke sath khelo!</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="menu-btn btn-blue" onclick="playClick(); startLocalTicTacToe()">❌⭕ Local Tic-Tac-Toe</button>
+                <button class="menu-btn" style="background: linear-gradient(45deg, #ef4444, #f59e0b); color: white; border: none;" onclick="playClick(); startTruthOrDare()">🔥 Truth or Dare</button>
+            </div>
+        </div>
+
+        <div id="offline-game-view" class="view-panel hidden">
+            <button class="menu-btn" style="background: transparent; color: #a1a1aa; border: 1px solid #444; width: auto; padding: 5px 15px; font-size: 12px; margin-bottom: 20px;" onclick="playClick(); switchView('offline-hub-view')">⬅️ LEAVE GAME</button>
+            
+            <h2 id="offline-game-title" style="margin-bottom: 20px; color: white;"></h2>
+            <div id="offline-game-content"></div>
+        </div>
+
+        <!-- online setup view -->
+        <div id="online-setup-view" class="view-panel hidden">
+            <button class="menu-btn" style="background: transparent; color: #a1a1aa; border: 1px solid #444; width: auto; padding: 5px 15px; font-size: 12px; margin-bottom: 20px;" onclick="playClick(); switchView('main-menu-view')">⬅️ BACK</button>
+            
+            <h1 style="color: var(--accent-blue); margin-bottom: 10px;">Player Profile</h1>
+            <input type="text" id="playerName" placeholder="Enter your Nickname" class="input-field" style="margin-bottom: 30px;">
+            
+            <div class="action-box" style="background: #1a1a24; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 15px;">
+                <h3 style="color: var(--accent-green); margin-bottom: 15px;">Host a Game</h3>
+                <button class="menu-btn btn-green" onclick="playClick(); createRoom()">CREATE NEW ROOM</button>
+            </div>
+            
+            <div class="action-box" style="background: #1a1a24; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+                <h3 style="color: var(--accent-blue); margin-bottom: 15px;">Join a Friend</h3>
+                <input type="text" id="joinCode" placeholder="4-Digit Room Code" class="input-field" maxlength="4" style="text-transform: uppercase; text-align: center; letter-spacing: 5px; font-size: 20px; font-weight: bold;">
+                <button class="menu-btn btn-blue" style="margin-top: 15px;" onclick="playClick(); joinRoom()">JOIN ROOM</button>
+            </div>
+        </div>
+
+        <!-- Waiting Room View -->
+        <div id="waiting-room-view" class="view-panel hidden">
+            <h2>Lobby Code: <span id="display-room-code" style="color: var(--accent-blue);">----</span></h2>
+            <p style="margin-top: 10px;">Players (<span id="player-count">0</span>/20):</p>
+            
+            <ul id="players-list" style="list-style: none; padding: 0; margin: 15px 0; text-align: left; background: #2a2a35; border-radius: 8px; padding: 10px;">
+                </ul>
+
+            <button id="start-game-btn" class="menu-btn btn-green hidden" onclick="playClick(); startGame()">🎮 Start Game</button>
+            <p id="waiting-host-msg" style="color: #a1a1aa; font-style: italic;">Host ke game start karne ka wait karein...</p>
+            
+            <button class="menu-btn btn-back" onclick="playClick(); switchView('dashboard-view')">⬅️ Leave Room</button>
+        </div>
+
+        <!-- Game Board View -->
+        <div id="game-board-view" class="view-panel hidden">
+            <h2 id="current-game-title">🎮 Fun Fusion Hub</h2>
+            
+            <div id="game-content" style="margin-top: 20px; min-height: 200px; background: #2a2a35; border-radius: 8px; padding: 20px;">
+                <p style="color: #a1a1aa;">Yahan par tumhari game load hogi...</p>
+            </div>
+            
+            <button class="menu-btn btn-back" onclick="playClick(); window.location.reload()">❌ Quit Game</button>
+        </div>
+
+        <div id="proposal-view" class="view-panel hidden" style="position: relative;">
+            <div id="hearts-container"></div> 
+            
+            <div class="proposal-content">
+                <h2 class="proposal-title">A Special Message 💌</h2>
+                <div id="letter-container" class="proposal-text" style="min-height: 150px;">
+                    "Some things are too important to say in a simple text message. <br><br>
+                    Please wait a moment while I load something just for you..."             
+                   </div>
+                <div id="proposal-actions" style="margin-top: 30px;">
+                    <button class="menu-btn btn-romantic" onclick="playClick(); openEnvelope()">Open Envelope ✨</button>
+                    <button class="menu-btn btn-glass" onclick="playClick(); switchView('dashboard-view')">⬅️ Maybe Later</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
